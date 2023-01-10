@@ -6,7 +6,7 @@ def read_sig(sig_path, freq_band=(None, None)):
     raw_edf = mne.io.read_raw_edf(sig_path, preload=True)
     
     if freq_band[0] and freq_band[1]:
-        print(f"Filtering signal using freq_band: {freq_band}")
+        print(f"Filtering signal using freq_band [Hz]: {freq_band}")
         raw_edf.filter(freq_band[0], freq_band[1], fir_design='firwin', skip_by_annotation='edge', verbose=False)
 
     data = raw_edf.get_data() # shape (n_signals x n_samples)
