@@ -1,9 +1,12 @@
 import mne
 import numpy as np
 
+FREQ_BAND = (3.0, 30.0) # [Hz]
 
-def read_sig(sig_path):
-    raw_edf = mne.io.read_raw_edf(sig_path)
+def read_sig(sig_path, band_pass_filter=True):
+    raw_edf = mne.io.read_raw_edf(sig_path, preload=True)
+    if band_pass_filter:
+        raw_edf.filter(FREQ_BAND[0], FREQ_BAND[1], fir_design='firwin', skip_by_annotation='edge', verbose=False)
 
     data = raw_edf.get_data() # shape (n_signals x n_samples)
     ch_names = raw_edf.ch_names
