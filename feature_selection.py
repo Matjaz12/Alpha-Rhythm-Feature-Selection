@@ -3,9 +3,6 @@ import mne
 import numpy as np
 import scipy
 
-from read_signal import read_sig
-from utils import get_intervals
-
 
 def compute_R2_from_lectures(mean_psd1, mean_psd2, psd1, psd2):
     # Compute number of examples for each activity
@@ -81,6 +78,7 @@ def compute_power_spectrum(sig, fs):
     psd, freq = mne.time_frequency.psd_array_multitaper(sig, sfreq=fs, verbose=False)
     return psd, freq
 
+
 def plot_R2_map(R2, max_freq, fs):
     if max_freq > (fs / 2):
        max_freq = fs / 2
@@ -100,30 +98,6 @@ def plot_R2_map(R2, max_freq, fs):
     plt.yticks(list(range(0, R2_cropped.shape[0], 5)))
     plt.show()
 
+
 def plot_head_distribution(R2, freq, ch_names):
     pass
-
-
-if __name__ == "__main__":
-    SIG_PATH = "./data/S001R03.edf"
-
-    # data, ch_names, annot, times, fs = read_sig(sig_path=SIG_PATH)
-    # _, intervals_t1, intervals_t2 = get_intervals(data, annot, fs)
-    # print(f"intervals_t1.shape: {intervals_t1.shape}")
-    # print(f"intervals_t2.shape: {intervals_t2.shape}")
-    
-    # R2 = compute_R2_map(intervals_t1, intervals_t2, fs=fs)
-    # print(f"R2.min(): {R2.min()}, R2.max(): {R2.max()}")
-    # plot_R2_map(R2, max_freq=50, fs=fs)
-
-    SIG_PATH1 = "./data/S001R01.edf" # eyes open
-    SIG_PATH2 = "./data/S001R02.edf" # eyes closes
-    data1, ch_names1, annot1, times1, fs1 = read_sig(sig_path=SIG_PATH1)
-    intervals1, _, _ = get_intervals(data1, annot1, fs1)
-    data2, ch_names2, annot2, times2, fs2 = read_sig(sig_path=SIG_PATH2)
-    intervals2, _, _ = get_intervals(data2, annot2, fs2)
-    
-    R2 = compute_R2_map(intervals1, intervals2, fs=fs1)
-    print(f"R2.min(): {R2.min()}, R2.max(): {R2.max()}")
-    print(f"R2.shape: {R2.shape}")
-    plot_R2_map(R2, max_freq=30, fs=fs1)
