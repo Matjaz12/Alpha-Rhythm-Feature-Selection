@@ -26,4 +26,6 @@ In order to run the program user must do the following:
 
 You can run the code using:
 
-`python3 main.py`.
+`python3 main.py <subject>`.
+
+e.g `python3 main.py S001`

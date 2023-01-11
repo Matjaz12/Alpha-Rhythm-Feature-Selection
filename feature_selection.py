@@ -63,7 +63,7 @@ def plot_R2_map(R2, max_freq, fs):
     plt.xlabel("Frequency [Hz]")
     max_samples = int(max_freq / (fs / 2) * R2.shape[1])
     R2_cropped = R2[:, 0:max_samples]
-    print(R2_cropped.shape)
+    # print(R2_cropped.shape)
     plt.imshow(R2_cropped, interpolation="nearest")
     k = fs / (2 * R2.shape[1])
     STEP = 20
