@@ -3,13 +3,12 @@ import mne
 import numpy as np
 import scipy
 
-
 def compute_R2_signal(mean_psd1, mean_psd2, psd1, psd2, eps=1e-10):
     if mean_psd1.shape != mean_psd2.shape:
         raise Exception("shape of mean_psd1 and mean_psd2 is not the same")
 
     # Compute number of examples for each activity
-    n_channels = psd1.shape[0]
+    N = psd1.shape[0]
     n_samples = len(mean_psd1)
     r2 = np.zeros(n_samples)
     
@@ -18,7 +17,7 @@ def compute_R2_signal(mean_psd1, mean_psd2, psd1, psd2, eps=1e-10):
         s2 = np.sum(psd2[:, idx])
         g1 = np.sum(psd1[:, idx] ** 2)
         g2 = np.sum(psd2[:, idx] ** 2)
-        r2[idx] = ((s1 - s2) ** 2) / (2 * n_channels * (g1 + g2) - (s1 + s2) ** 2 + eps)
+        r2[idx] = ((s1 - s2) ** 2) / (2 * N * (g1 + g2) - (s1 + s2) ** 2 + eps)
 
     return r2
 
@@ -39,8 +38,8 @@ def compute_R2_map(intervals1, intevals2, fs):
 
         # Compute r2 for current channel_idx
         r2 = compute_R2_signal(mean_psd1, mean_psd2, psd1, psd2)
-        # plot_psd_and_r2(mean_psd1, mean_psd2, r2)
-        # break
+        if channel_idx == 60: 
+            plot_psd_and_r2(mean_psd1, mean_psd2, r2, fs, channel_idx)
 
         R2.append(r2)
 
@@ -58,7 +57,7 @@ def plot_R2_map(R2, max_freq, fs):
     if max_freq > (fs / 2):
        max_freq = fs / 2
 
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(10, 8))
     plt.title("R2 as a function of channel number and frequency")
     plt.ylabel("Channel number")
     plt.xlabel("Frequency [Hz]")
@@ -71,20 +70,27 @@ def plot_R2_map(R2, max_freq, fs):
     freqs = np.array([round(k * x, 2) for x in range(0, R2_cropped.shape[1], STEP)])
     plt.xticks(list(range(0, R2_cropped.shape[1], STEP)), freqs)
     plt.yticks(list(range(0, R2_cropped.shape[0], 5)))
+    plt.tight_layout()
+    plt.savefig("./results/r2_map.pdf")
     plt.show()
 
 
-def plot_psd_and_r2(mean_psd1, mean_psd2, r2):
-    plt.figure(1)
+def plot_psd_and_r2(mean_psd1, mean_psd2, r2, fs, channel_idx):
+    STEP = 20
+    k = fs / (2 * len(mean_psd1))
+    freqs = np.array([round(k * x, 1) for x in range(0, len(mean_psd1), STEP)])
+    plt.figure(1, figsize=(10, 8))
     plt.subplot(211)
+    plt.title(f"Mean power spectrums and corresponing R2 signal for channel {channel_idx}")
     plt.plot(mean_psd1, label="Mean power spectrum 1")
     plt.plot(mean_psd2, label="Mean power spectrum 2")
+    plt.xticks(list(range(0, len(mean_psd1), STEP)), freqs)
+    plt.xlabel("Frequency [Hz]")
     plt.legend()
     plt.subplot(212)
     plt.plot(r2, label="R2")
+    plt.xticks(list(range(0, len(mean_psd1), STEP)), freqs)
+    plt.xlabel("Frequency [Hz]")
     plt.legend()
-    plt.show()
-
-
-def plot_head_distribution(R2, freq, ch_names):
-    pass
+    plt.tight_layout()
+    plt.savefig(f"./results/r2_signal_{channel_idx}.pdf")
